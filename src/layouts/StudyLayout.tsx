@@ -16,13 +16,13 @@ const StudyLayout = () => {
   const currentStep = pathToStep[location.pathname] || "generate";
 
   return (
-    <div className="min-h-screen bg-[#F6F7FA]">
+    <div className="min-h-screen bg-[#F6F7FA] flex flex-col">
       <Header />
 
-      <div className="min-h-screen p-6 flex flex-col align-center justify-center">
+      <div className="flex-1 px-4 py-6 flex flex-col items-center">
         <StudyProgress currentStep={currentStep} />
 
-        <main className="max-w-7xl mx-auto px-6 sm:px-8 py-4">
+        <main className="w-full max-w-7xl mx-auto px-2 sm:px-6 py-4">
           <Outlet />
         </main>
       </div>

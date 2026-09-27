@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import type { StudyStep } from "../types/study";
+import { useStudy } from "../context/StudyContext";
 
 interface StudyProgressProps {
   currentStep: StudyStep;
@@ -40,7 +41,22 @@ const steps: StepItem[] = [
 ];
 
 const StudyProgress = ({ currentStep }: StudyProgressProps) => {
+  const { studySet, quizResult } = useStudy();
   const currentIndex = steps.findIndex((step) => step.id === currentStep);
+
+  const isStepUnlocked = (stepId: StudyStep) => {
+    switch (stepId) {
+      case "generate":
+        return true;
+      case "flashcards":
+      case "quiz":
+        return !!studySet;
+      case "results":
+        return !!quizResult;
+      default:
+        return false;
+    }
+  };
 
   return (
     <div className="flex justify-center px-4 py-6">
@@ -48,26 +64,10 @@ const StudyProgress = ({ currentStep }: StudyProgressProps) => {
         {steps.map((step, index) => {
           const isCompleted = index < currentIndex;
           const isCurrent = index === currentIndex;
+          const unlocked = isStepUnlocked(step.id);
 
-          return (
-            <Link
-              key={step.id}
-              to={step.path}
-              className={`
-                flex items-center gap-2
-                rounded-full
-                px-4 py-2
-                text-sm font-medium
-                transition-all duration-200
-                ${
-                  isCompleted
-                    ? "bg-[#E6F4EA] text-[#137333] hover:bg-[#D7EFE0]"
-                    : isCurrent
-                    ? "bg-[#E8E5FC] text-[#453DD1]"
-                    : "bg-[#EEF0F4] text-[#616B80] hover:bg-[#E2E6ED]"
-                }
-              `}
-            >
+          const content = (
+            <>
               <span
                 className={`
                   flex h-6 w-6 items-center justify-center
@@ -102,7 +102,38 @@ const StudyProgress = ({ currentStep }: StudyProgressProps) => {
               </span>
 
               <span>{step.label}</span>
-            </Link>
+            </>
+          );
+
+          const className = `
+            flex items-center gap-2
+            rounded-full
+            px-4 py-2
+            text-sm font-medium
+            transition-all duration-200
+            ${
+              isCompleted
+                ? "bg-[#E6F4EA] text-[#137333] hover:bg-[#D7EFE0]"
+                : isCurrent
+                ? "bg-[#E8E5FC] text-[#453DD1]"
+                : unlocked
+                ? "bg-[#EEF0F4] text-[#616B80] hover:bg-[#E2E6ED] cursor-pointer"
+                : "bg-[#F1F3F7] text-[#9AA2B1] opacity-60 cursor-not-allowed select-none"
+            }
+          `;
+
+          if (unlocked) {
+            return (
+              <Link key={step.id} to={step.path} className={className}>
+                {content}
+              </Link>
+            );
+          }
+
+          return (
+            <div key={step.id} className={className} title="Complete previous step to unlock">
+              {content}
+            </div>
           );
         })}
       </div>
@@ -110,4 +141,4 @@ const StudyProgress = ({ currentStep }: StudyProgressProps) => {
   );
 };
 
-export default StudyProgress;
+export default StudyProgress;

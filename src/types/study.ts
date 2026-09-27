@@ -17,17 +17,23 @@ export interface QuizQuestion {
   question: string;
   options: string[];
   correctAnswer: string;
+  explanation?: string;
 }
 
 export interface StudySet {
   id: string;
   topic: string;
+  rawNotes?: string;
+  createdAt?: number;
   flashcards: Flashcard[];
   questions: QuizQuestion[];
 }
 
 export interface QuizResult {
   correct: number;
-  wrong:number;
+  wrong: number;
   total: number;
+  userAnswers?: Record<string, string>;
+  mistakeQuestionIds?: string[];
+  percentage?: number;
 }
